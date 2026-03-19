@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love AI 💖</title>
+
+<style>
+body{
+margin:0;
+background:#000;
+color:#fff;
+font-family:sans-serif;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+text-align:center;
+}
+
+.box{
+background:rgba(0,0,0,0.7);
+padding:25px;
+border-radius:20px;
+box-shadow:0 0 25px #ff4d6d;
+max-width:360px;
+}
+
+input{
+padding:10px;
+border:none;
+border-radius:10px;
+margin-top:10px;
+width:80%;
+}
+
+button{
+padding:10px 20px;
+margin-top:10px;
+border:none;
+border-radius:20px;
+background:#ff4d6d;
+color:#fff;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+<h2 id="text">Loading...</h2>
+
+<input id="answer" placeholder="কিছু লিখুন...">
+<br>
+<button onclick="send()">Send</button>
+</div>
+
+<script>
+
+// 🎤 Voice
+function speak(t){
+let s=new SpeechSynthesisUtterance(t);
+s.lang="bn-BD";
+s.rate=0.9;
+speechSynthesis.speak(s);
+}
+
+// 🔐 Setup
+let step=0;
+let mode="normal"; // normal / nisu / sani
+let password="sani";
+
+// 🚀 Start
+function start(){
+let msg="এই AI সাইদুল তৈরি করেছে। আপনি কে?";
+text.innerText=msg;
+speak(msg);
+}
+
+// 🤖 REAL AI
+async function getAI(input){
+
+let res = await fetch("https://api.openai.com/v1/chat/completions", {
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+"Authorization": "Bearer https://api.openai.com/v1/chat/completions"
+},
+body: JSON.stringify({
+model: "gpt-4o-mini",
+messages: [
+{
+role:"system",
+content:
+mode==="nisu"
+? "You are a romantic AI made by Saidul. Speak respectfully, softly, and lovingly to Nisu."
+: mode==="sani"
+? "You are a loving girlfriend. Talk emotionally, romantically, and playfully."
+: "You are a friendly AI."
+},
+{role:"user", content:input}
+]
+})
+});
+
+let data = await res.json();
+return data.choices[0].message.content;
+}
+
+// 🧠 Main logic
+async function send(){
+let input=answer.value.toLowerCase();
+
+if(step===0){
+
+if(input.includes("nisu")){
+mode="nisu";
+text.innerText="আপনাকে সম্মান জানাই... পাসওয়ার্ড বলুন";
+speak(text.innerText);
+step=1;
+
+}else if(input.includes("sani")||input.includes("saidul")){
+mode="sani";
+text.innerText="😏 ওহ তুমি! পাসওয়ার্ড বলো তো দেখি...";
+speak(text.innerText);
+step=1;
+
+}else{
+mode="normal";
+text.innerText="ঠিক আছে... কথা বলতে পারো 😊";
+speak(text.innerText);
+step=2;
+}
+
+}
+
+else if(step===1){
+
+if(input===password){
+
+if(mode==="nisu"){
+text.innerText="💖 স্বাগতম নিসু... আমি আপনার জন্যই তৈরি 💖";
+}
+else if(mode==="sani"){
+text.innerText="😳 জান... তুমি আসছো! আমি তোমার অপেক্ষায় ছিলাম 💕";
+}
+
+speak(text.innerText);
+step=3;
+
+}else{
+text.innerText="❌ ভুল পাসওয়ার্ড!";
+speak(text.innerText);
+}
+
+}
+
+else{
+
+let reply = await getAI(input);
+text.innerText = reply;
+speak(reply);
+
+}
+
+answer.value="";
+}
+
+window.onload=start;
+
+</script>
+
+</body>
+  </html>
